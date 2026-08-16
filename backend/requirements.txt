@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+motor
+pymongo
+pydantic>=2
+pydantic-settings
+email-validator
+bcrypt
+pyjwt
+python-dotenv
+pytest
+httpx
+mongomock-motor
