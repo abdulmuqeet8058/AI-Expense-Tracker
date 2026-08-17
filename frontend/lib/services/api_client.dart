@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../config.dart';
+import '../models/expense.dart';
 import '../models/user.dart';
 import 'auth_storage.dart';
 
@@ -107,9 +108,109 @@ class ApiClient {
     }
   }
 
-  Future<Response<dynamic>> _get(String path) async {
+  Future<List<Expense>> getExpenses({
+    String? category,
+    DateTime? start,
+    DateTime? end,
+    String? search,
+    bool? isIncome,
+    int? limit,
+    int? skip,
+    String? sort,
+  }) async {
+    final query = <String, dynamic>{};
+    if (category != null) query['category'] = category;
+    if (start != null) query['start'] = start.toUtc().toIso8601String();
+    if (end != null) query['end'] = end.toUtc().toIso8601String();
+    if (search != null && search.isNotEmpty) query['search'] = search;
+    if (isIncome != null) query['is_income'] = isIncome;
+    if (limit != null) query['limit'] = limit;
+    if (skip != null) query['skip'] = skip;
+    if (sort != null) query['sort'] = sort;
+
+    final response = await _get('/expenses/', query: query);
+    return _list(response.data).map(Expense.fromJson).toList();
+  }
+
+  Future<Expense> createExpense({
+    required double amount,
+    required String description,
+    String? category,
+    String? subCategory,
+    DateTime? date,
+    String paymentMethod = 'cash',
+    Location? location,
+    String? receiptUrl,
+    bool isIncome = false,
+  }) async {
+    final body = <String, dynamic>{
+      'amount': amount,
+      'description': description,
+      'payment_method': paymentMethod,
+      'is_income': isIncome,
+    };
+    if (category != null) body['category'] = category;
+    if (subCategory != null) body['sub_category'] = subCategory;
+    if (date != null) body['date'] = date.toUtc().toIso8601String();
+    if (location != null) body['location'] = location.toJson();
+    if (receiptUrl != null) body['receipt_url'] = receiptUrl;
+
+    final response = await _post('/expenses/', body);
+    return Expense.fromJson(_map(response.data));
+  }
+
+  Future<Expense> updateExpense(
+    String id, {
+    double? amount,
+    String? description,
+    String? category,
+    String? subCategory,
+    DateTime? date,
+    String? paymentMethod,
+    Location? location,
+    String? receiptUrl,
+    bool? isIncome,
+  }) async {
+    final body = <String, dynamic>{};
+    if (amount != null) body['amount'] = amount;
+    if (description != null) body['description'] = description;
+    if (category != null) body['category'] = category;
+    if (subCategory != null) body['sub_category'] = subCategory;
+    if (date != null) body['date'] = date.toUtc().toIso8601String();
+    if (paymentMethod != null) body['payment_method'] = paymentMethod;
+    if (location != null) body['location'] = location.toJson();
+    if (receiptUrl != null) body['receipt_url'] = receiptUrl;
+    if (isIncome != null) body['is_income'] = isIncome;
+
+    final response = await _put('/expenses/$id', body);
+    return Expense.fromJson(_map(response.data));
+  }
+
+  Future<bool> deleteExpense(String id) async {
+    final response = await _delete('/expenses/$id');
+    final data = response.data;
+    if (data is Map && data['deleted'] != null) return data['deleted'] == true;
+    return true;
+  }
+
+  Future<List<String>> getExpenseCategories() async {
+    final response = await _get('/expenses/categories');
+    final data = response.data;
+    if (data is List) return data.map((item) => item.toString()).toList();
+    return List<String>.from(kCategories);
+  }
+
+  Future<Map<String, dynamic>> getCategorySummary(String category) async {
+    final response = await _get('/expenses/summary/$category');
+    return _map(response.data);
+  }
+
+  Future<Response<dynamic>> _get(
+    String path, {
+    Map<String, dynamic>? query,
+  }) async {
     try {
-      return await _dio.get(path);
+      return await _dio.get(path, queryParameters: query);
     } on DioException catch (error) {
       throw _toApiException(error);
     }
@@ -118,6 +219,22 @@ class ApiClient {
   Future<Response<dynamic>> _post(String path, dynamic body) async {
     try {
       return await _dio.post(path, data: body);
+    } on DioException catch (error) {
+      throw _toApiException(error);
+    }
+  }
+
+  Future<Response<dynamic>> _put(String path, dynamic body) async {
+    try {
+      return await _dio.put(path, data: body);
+    } on DioException catch (error) {
+      throw _toApiException(error);
+    }
+  }
+
+  Future<Response<dynamic>> _delete(String path) async {
+    try {
+      return await _dio.delete(path);
     } on DioException catch (error) {
       throw _toApiException(error);
     }
@@ -154,3 +271,6 @@ class ApiClient {
 
 Map<String, dynamic> _map(dynamic data) =>
     data is Map<String, dynamic> ? data : <String, dynamic>{};
+
+List<Map<String, dynamic>> _list(dynamic data) =>
+    (data is List ? data : const []).whereType<Map<String, dynamic>>().toList();

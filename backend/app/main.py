@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import settings
 from app.database import ensure_indexes
-from app.routes import auth
+from app.routes import auth, expenses
 
 
 @asynccontextmanager
@@ -52,7 +52,8 @@ async def rate_limit(request: Request, call_next):
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "phase": 1}
+    return {"status": "ok", "phase": 2}
 
 
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(expenses.router, prefix="/api/expenses", tags=["expenses"])

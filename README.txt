@@ -1,6 +1,6 @@
-SMART EXPENSE TRACKER - PHASE 1
+SMART EXPENSE TRACKER - PHASE 2
 
-Phase 1 establishes the application foundation and authentication flow.
+Phase 2 adds the first complete financial workflow: recording and managing income and expenses.
 
 CURRENT FEATURES
 
@@ -10,7 +10,12 @@ CURRENT FEATURES
 - JWT access and refresh token generation
 - Secure token storage on the client
 - Automatic saved-session validation at startup
-- Authenticated home screen and logout
+- Authenticated dashboard and logout
+- Add income and expense transactions
+- Fixed financial categories and payment methods
+- Search, filter, date range, and sorting controls
+- Transaction detail view and deletion
+- Local Hive cache for the expense list
 - FastAPI backend with MongoDB
 - API health endpoint and interactive Swagger documentation
 - Basic in-memory API rate limiting
@@ -123,5 +128,4 @@ flutter test
 
 PLANNED NEXT PHASE
 
-Phase 2 will introduce expense and income management, categories, searching, filtering, and local
-expense caching.
+Phase 3 will introduce monthly budgets, dashboard analytics, charts, and category breakdowns.

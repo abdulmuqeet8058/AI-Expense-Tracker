@@ -4,6 +4,12 @@ from types import SimpleNamespace
 
 import pytest
 
+CATEGORIES = [
+    "Food & Dining", "Transportation", "Shopping", "Entertainment",
+    "Bills & Utilities", "Healthcare", "Education", "Groceries", "Travel",
+    "Rent", "Insurance", "Personal Care", "Miscellaneous",
+]
+
 try:
     import motor.motor_asyncio
     from mongomock_motor import AsyncMongoMockClient
@@ -24,6 +30,11 @@ def app_client():
 
     with TestClient(app) as client:
         yield client
+
+
+@pytest.fixture
+def categories():
+    return list(CATEGORIES)
 
 
 @pytest.fixture
