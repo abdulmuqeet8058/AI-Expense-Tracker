@@ -66,8 +66,9 @@ class Expense {
           : null,
       receiptUrl: json['receipt_url'] as String?,
       isIncome: json['is_income'] as bool? ?? false,
-      confidenceScore:
-          json['confidence_score'] == null ? null : _toDouble(json['confidence_score']),
+      confidenceScore: json['confidence_score'] == null
+          ? null
+          : _toDouble(json['confidence_score']),
       createdAt: _toDate(json['created_at']),
       updatedAt: _toDate(json['updated_at']),
     );

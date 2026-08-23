@@ -119,7 +119,7 @@ class _SlideView extends StatelessWidget {
             height: 160,
             width: 160,
             decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha:0.12),
+              color: AppColors.primary.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(slide.icon, size: 76, color: AppColors.primary),
@@ -165,7 +165,9 @@ class _Dots extends StatelessWidget {
           height: 8,
           width: on ? 22 : 8,
           decoration: BoxDecoration(
-            color: on ? AppColors.primary : AppColors.primary.withValues(alpha:0.25),
+            color: on
+                ? AppColors.primary
+                : AppColors.primary.withValues(alpha: 0.25),
             borderRadius: BorderRadius.circular(4),
           ),
         );

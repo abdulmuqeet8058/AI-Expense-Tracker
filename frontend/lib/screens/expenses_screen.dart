@@ -10,7 +10,8 @@ import '../widgets/category_chip.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/loading_shimmer.dart';
 
-final _money = NumberFormat.currency(symbol: '$kDefaultCurrencySymbol ', decimalDigits: 0);
+final _money =
+    NumberFormat.currency(symbol: '$kDefaultCurrencySymbol ', decimalDigits: 0);
 
 enum _Sort { newest, oldest, highest, lowest }
 
@@ -51,7 +52,8 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
     final q = _search.trim().toLowerCase();
     final out = items.where((e) {
       if (_removing.contains(e.id)) return false;
-      if (q.isNotEmpty && !'${e.description} ${e.category ?? ''}'.toLowerCase().contains(q)) {
+      if (q.isNotEmpty &&
+          !'${e.description} ${e.category ?? ''}'.toLowerCase().contains(q)) {
         return false;
       }
       if (_category != null && e.category != _category) return false;
@@ -108,7 +110,8 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
       await ref.read(expensesProvider.notifier).delete(e.id);
       if (!mounted) return;
       setState(() => _removing.remove(e.id));
-      messenger.showSnackBar(SnackBar(content: Text('Deleted "${e.description}"')));
+      messenger
+          .showSnackBar(SnackBar(content: Text('Deleted "${e.description}"')));
     } catch (_) {
       if (!mounted) return;
       setState(() => _removing.remove(e.id)); // put it back
@@ -125,7 +128,9 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
         title: const Text('Delete expense?'),
         content: Text('"${e.description}" will be permanently removed.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Cancel')),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
             onPressed: () => Navigator.pop(ctx, true),
@@ -147,7 +152,9 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
         actions: [
           IconButton(
             tooltip: 'Filter by date',
-            icon: Icon(_range == null ? Icons.date_range_outlined : Icons.event_available),
+            icon: Icon(_range == null
+                ? Icons.date_range_outlined
+                : Icons.event_available),
             onPressed: _pickRange,
           ),
           PopupMenuButton<_Sort>(
@@ -178,7 +185,9 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                 final items = _apply(all);
                 if (items.isEmpty) {
                   return EmptyState(
-                    icon: _hasFilters ? Icons.search_off : Icons.receipt_long_outlined,
+                    icon: _hasFilters
+                        ? Icons.search_off
+                        : Icons.receipt_long_outlined,
                     title: all.isEmpty ? 'No expenses yet' : 'Nothing matches',
                     message: all.isEmpty
                         ? 'Tap the + button to log your first expense.'
@@ -188,7 +197,8 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                   );
                 }
                 return RefreshIndicator(
-                  onRefresh: () => ref.read(expensesProvider.notifier).refresh(),
+                  onRefresh: () =>
+                      ref.read(expensesProvider.notifier).refresh(),
                   child: Column(
                     children: [
                       _summaryBar(items),
@@ -244,7 +254,8 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
             CategoryChip(
               category: c,
               selected: _category == c,
-              onTap: () => setState(() => _category = _category == c ? null : c),
+              onTap: () =>
+                  setState(() => _category = _category == c ? null : c),
             ),
             const SizedBox(width: 8),
           ],
@@ -350,7 +361,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
               children: [
                 CircleAvatar(
                   radius: 22,
-                  backgroundColor: color.withValues(alpha:0.15),
+                  backgroundColor: color.withValues(alpha: 0.15),
                   child: Icon(categoryIcon(e.category), color: color, size: 20),
                 ),
                 const SizedBox(width: 12),
@@ -365,8 +376,8 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                       const SizedBox(height: 2),
                       Text(
                         '${e.category ?? 'Uncategorized'} · ${DateFormat('d MMM').format(e.date)}',
-                        style: theme.textTheme.bodySmall
-                            ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                        style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -376,7 +387,9 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                   '${e.isIncome ? '+' : '-'}${_money.format(e.amount)}',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
-                    color: e.isIncome ? AppColors.income : theme.colorScheme.onSurface,
+                    color: e.isIncome
+                        ? AppColors.income
+                        : theme.colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -403,7 +416,7 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                 Row(
                   children: [
                     CircleAvatar(
-                      backgroundColor: color.withValues(alpha:0.15),
+                      backgroundColor: color.withValues(alpha: 0.15),
                       child: Icon(categoryIcon(e.category), color: color),
                     ),
                     const SizedBox(width: 12),
@@ -417,14 +430,16 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w800,
-                        color: e.isIncome ? AppColors.income : AppColors.expense,
+                        color:
+                            e.isIncome ? AppColors.income : AppColors.expense,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 _detailRow('Category', e.category ?? 'Uncategorized'),
-                _detailRow('Date', DateFormat('EEEE, d MMMM yyyy').format(e.date)),
+                _detailRow(
+                    'Date', DateFormat('EEEE, d MMMM yyyy').format(e.date)),
                 _detailRow('Payment', e.paymentMethod),
                 _detailRow('Type', e.isIncome ? 'Income' : 'Expense'),
                 if (e.confidenceScore != null)
@@ -434,7 +449,8 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(foregroundColor: AppColors.danger),
+                    style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.danger),
                     icon: const Icon(Icons.delete_outline),
                     label: const Text('Delete'),
                     onPressed: () async {
@@ -463,10 +479,12 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
           SizedBox(
             width: 120,
             child: Text(label,
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant)),
           ),
           Expanded(
-            child: Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+            child: Text(value,
+                style: const TextStyle(fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -488,7 +506,8 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
             Text('$error',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                    fontSize: 12, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant)),
             const SizedBox(height: 16),
             FilledButton.tonal(
               onPressed: () => ref.read(expensesProvider.notifier).refresh(),
@@ -521,9 +540,10 @@ class _AllChip extends StatelessWidget {
           duration: const Duration(milliseconds: 180),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
-            color: selected ? c : c.withValues(alpha:0.12),
+            color: selected ? c : c.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(20),
-            border: selected ? null : Border.all(color: c.withValues(alpha:0.25)),
+            border:
+                selected ? null : Border.all(color: c.withValues(alpha: 0.25)),
           ),
           child: Text(
             'All',

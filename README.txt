@@ -1,6 +1,6 @@
-SMART EXPENSE TRACKER - PHASE 2
+SMART EXPENSE TRACKER - PHASE 3
 
-Phase 2 adds the first complete financial workflow: recording and managing income and expenses.
+Phase 3 adds budgeting, dashboard analytics, charts, reports, and category breakdowns.
 
 CURRENT FEATURES
 
@@ -16,6 +16,13 @@ CURRENT FEATURES
 - Search, filter, date range, and sorting controls
 - Transaction detail view and deletion
 - Local Hive cache for the expense list
+- Monthly category budgets with configurable alert thresholds
+- Live budget usage and over-budget warnings
+- Dashboard totals, net balance, top categories, and recent activity
+- Daily, monthly, and category spending charts
+- Category breakdowns and six-month spending trends
+- Monthly financial reports and data export endpoints
+- AI-powered categorization and insights preview for the next phase
 - FastAPI backend with MongoDB
 - API health endpoint and interactive Swagger documentation
 - Basic in-memory API rate limiting
@@ -26,6 +33,7 @@ Frontend:
 - Flutter and Dart
 - Riverpod state management
 - Dio HTTP client
+- fl_chart data visualization
 - flutter_secure_storage
 - shared_preferences
 
@@ -43,6 +51,8 @@ Expense tracker/
 |-- backend/
 |   |-- app/
 |   |   |-- routes/auth.py
+|   |   |-- routes/budgets.py
+|   |   |-- routes/analytics.py
 |   |   |-- auth.py
 |   |   |-- config.py
 |   |   |-- database.py
@@ -105,9 +115,9 @@ cd frontend
 flutter pub get
 flutter run
 
-The default API address is configured for an Android emulator:
+The default API address is configured for the current physical Android device network:
 
-http://10.0.2.2:8000/api
+http://192.168.100.5:8000/api
 
 For Chrome or desktop, run:
 
@@ -128,4 +138,5 @@ flutter test
 
 PLANNED NEXT PHASE
 
-Phase 3 will introduce monthly budgets, dashboard analytics, charts, and category breakdowns.
+Phase 4 will introduce trained ML categorization, spending forecasts, anomaly detection,
+personalized AI insights, and receipt support.

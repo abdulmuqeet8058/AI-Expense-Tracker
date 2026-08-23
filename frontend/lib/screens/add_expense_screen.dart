@@ -97,7 +97,8 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
     final theme = Theme.of(context);
 
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Container(
         decoration: BoxDecoration(
           color: theme.scaffoldBackgroundColor,
@@ -286,6 +287,5 @@ class _TransactionType extends StatelessWidget {
   }
 }
 
-String _titleCase(String value) => value.isEmpty
-    ? value
-    : value[0].toUpperCase() + value.substring(1);
+String _titleCase(String value) =>
+    value.isEmpty ? value : value[0].toUpperCase() + value.substring(1);

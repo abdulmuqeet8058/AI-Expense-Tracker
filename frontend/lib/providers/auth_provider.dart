@@ -60,8 +60,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = state.copyWith(status: AuthStatus.authenticated, user: user);
     } catch (_) {
       await _storage.clear();
-      state = state.copyWith(
-          status: AuthStatus.unauthenticated, clearUser: true);
+      state =
+          state.copyWith(status: AuthStatus.unauthenticated, clearUser: true);
     }
   }
 
@@ -112,8 +112,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   void clearError() => state = state.copyWith(clearError: true);
 }
 
-final authProvider =
-    StateNotifierProvider<AuthNotifier, AuthState>((ref) {
+final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(
     ref.watch(apiClientProvider),
     ref.watch(authStorageProvider),

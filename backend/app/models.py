@@ -76,3 +76,32 @@ class ExpenseOut(BaseModel):
     confidence_score: Optional[float] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
+
+
+class BudgetCreate(BaseModel):
+    category: str
+    monthly_limit: float = Field(gt=0)
+    month: int = Field(ge=1, le=12)
+    year: int = Field(ge=2000, le=2100)
+    alert_threshold: float = Field(default=80, ge=0, le=100)
+
+
+class BudgetUpdate(BaseModel):
+    category: Optional[str] = None
+    monthly_limit: Optional[float] = Field(default=None, gt=0)
+    month: Optional[int] = Field(default=None, ge=1, le=12)
+    year: Optional[int] = Field(default=None, ge=2000, le=2100)
+    alert_threshold: Optional[float] = Field(default=None, ge=0, le=100)
+
+
+class BudgetOut(BaseModel):
+    id: str
+    user_id: str
+    category: str
+    monthly_limit: float
+    month: int
+    year: int
+    alert_threshold: float = 80
+    current_spent: float = 0
+    created_at: datetime
+    updated_at: Optional[datetime] = None

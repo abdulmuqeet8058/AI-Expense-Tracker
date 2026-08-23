@@ -62,8 +62,7 @@ class ExpenseNotifier extends StateNotifier<AsyncValue<List<Expense>>> {
   ExpenseFilter _filter = const ExpenseFilter();
   ExpenseFilter get filter => _filter;
 
-  ExpenseNotifier(this._api, this._cache)
-      : super(const AsyncValue.loading()) {
+  ExpenseNotifier(this._api, this._cache) : super(const AsyncValue.loading()) {
     refresh();
   }
 

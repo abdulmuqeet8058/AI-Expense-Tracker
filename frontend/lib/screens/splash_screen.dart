@@ -41,7 +41,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     ref.read(authProvider);
     await Future<void>.delayed(const Duration(milliseconds: 1200));
     var waited = 0;
-    while (ref.read(authProvider).status == AuthStatus.unknown && waited < 3000) {
+    while (
+        ref.read(authProvider).status == AuthStatus.unknown && waited < 3000) {
       await Future<void>.delayed(const Duration(milliseconds: 50));
       waited += 50;
     }
@@ -118,7 +119,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   Text(
                     'Track. Save. Grow.',
                     style: TextStyle(
-                      color: Colors.white.withValues(alpha:0.85),
+                      color: Colors.white.withValues(alpha: 0.85),
                       fontSize: 14,
                     ),
                   ),

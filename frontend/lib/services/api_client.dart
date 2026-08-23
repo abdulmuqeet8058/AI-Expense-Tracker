@@ -1,6 +1,9 @@
 import 'package:dio/dio.dart';
 
 import '../config.dart';
+import '../models/budget.dart';
+import '../models/chart_data.dart';
+import '../models/dashboard.dart';
 import '../models/expense.dart';
 import '../models/user.dart';
 import 'auth_storage.dart';
@@ -203,6 +206,84 @@ class ApiClient {
   Future<Map<String, dynamic>> getCategorySummary(String category) async {
     final response = await _get('/expenses/summary/$category');
     return _map(response.data);
+  }
+
+  Future<List<Budget>> getBudgets() async {
+    final response = await _get('/budgets/');
+    return _list(response.data).map(Budget.fromJson).toList();
+  }
+
+  Future<Budget> createBudget({
+    required String category,
+    required double monthlyLimit,
+    required int month,
+    required int year,
+    double alertThreshold = 80,
+  }) async {
+    final response = await _post('/budgets/', {
+      'category': category,
+      'monthly_limit': monthlyLimit,
+      'month': month,
+      'year': year,
+      'alert_threshold': alertThreshold,
+    });
+    return Budget.fromJson(_map(response.data));
+  }
+
+  Future<Budget> updateBudget(
+    String id, {
+    String? category,
+    double? monthlyLimit,
+    int? month,
+    int? year,
+    double? alertThreshold,
+  }) async {
+    final body = <String, dynamic>{};
+    if (category != null) body['category'] = category;
+    if (monthlyLimit != null) body['monthly_limit'] = monthlyLimit;
+    if (month != null) body['month'] = month;
+    if (year != null) body['year'] = year;
+    if (alertThreshold != null) body['alert_threshold'] = alertThreshold;
+
+    final response = await _put('/budgets/$id', body);
+    return Budget.fromJson(_map(response.data));
+  }
+
+  Future<bool> deleteBudget(String id) async {
+    final response = await _delete('/budgets/$id');
+    final data = response.data;
+    if (data is Map && data['deleted'] != null) return data['deleted'] == true;
+    return true;
+  }
+
+  Future<List<Budget>> getBudgetAlerts() async {
+    final response = await _get('/budgets/alerts');
+    return _list(response.data).map(Budget.fromJson).toList();
+  }
+
+  Future<Dashboard> getDashboard() async {
+    final response = await _get('/analytics/dashboard');
+    return Dashboard.fromJson(_map(response.data));
+  }
+
+  Future<ChartData> getCharts() async {
+    final response = await _get('/analytics/charts');
+    return ChartData.fromJson(_map(response.data));
+  }
+
+  Future<List<MonthlyTotal>> getTrends(String category) async {
+    final response = await _get('/analytics/trends/$category');
+    final data = response.data;
+    if (data is Map) {
+      final months = data['months'];
+      if (months is List) {
+        return months
+            .whereType<Map<String, dynamic>>()
+            .map(MonthlyTotal.fromJson)
+            .toList();
+      }
+    }
+    return const [];
   }
 
   Future<Response<dynamic>> _get(

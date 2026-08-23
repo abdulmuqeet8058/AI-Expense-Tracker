@@ -84,7 +84,7 @@ class CategoryChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = colorForCategory(category);
-    final bg = selected ? c : c.withValues(alpha:0.12);
+    final bg = selected ? c : c.withValues(alpha: 0.12);
     final fg = selected ? Colors.white : c;
 
     return Material(
@@ -98,9 +98,8 @@ class CategoryChip extends StatelessWidget {
           decoration: BoxDecoration(
             color: bg,
             borderRadius: BorderRadius.circular(20),
-            border: selected
-                ? null
-                : Border.all(color: c.withValues(alpha:0.25)),
+            border:
+                selected ? null : Border.all(color: c.withValues(alpha: 0.25)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,

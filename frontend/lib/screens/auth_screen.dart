@@ -57,8 +57,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen>
               const SizedBox(height: 28),
               Container(
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest
-                      .withValues(alpha:0.4),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surfaceContainerHighest
+                      .withValues(alpha: 0.4),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: TabBar(

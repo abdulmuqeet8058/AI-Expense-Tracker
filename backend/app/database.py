@@ -8,9 +8,14 @@ db = client[settings.db_name]
 
 users = db.users
 expenses = db.expenses
+budgets = db.budgets
 
 
 async def ensure_indexes() -> None:
     await users.create_index("email", unique=True)
     await expenses.create_index("user_id")
     await expenses.create_index([("user_id", ASCENDING), ("date", DESCENDING)])
+    await budgets.create_index("user_id")
+    await budgets.create_index(
+        [("user_id", ASCENDING), ("year", DESCENDING), ("month", DESCENDING)]
+    )
