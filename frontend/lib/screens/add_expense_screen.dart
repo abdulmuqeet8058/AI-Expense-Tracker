@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,7 +7,9 @@ import 'package:intl/intl.dart';
 
 import '../config.dart';
 import '../providers/auth_provider.dart';
+import '../providers/api_provider.dart';
 import '../providers/expense_provider.dart';
+import '../models/expense.dart';
 import '../services/api_client.dart';
 import '../theme.dart';
 import '../widgets/category_chip.dart';
@@ -23,15 +27,61 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
 
   bool _isIncome = false;
   bool _saving = false;
-  String _category = 'Miscellaneous';
+  String? _category;
   String _payment = 'cash';
   DateTime _date = DateTime.now();
+  Timer? _suggestionTimer;
+  CategorizeResult? _suggestion;
+  bool _suggesting = false;
+  bool _manualCategory = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _description.addListener(_scheduleSuggestion);
+  }
 
   @override
   void dispose() {
+    _suggestionTimer?.cancel();
     _amount.dispose();
     _description.dispose();
     super.dispose();
+  }
+
+  void _scheduleSuggestion() {
+    _suggestionTimer?.cancel();
+    final description = _description.text.trim();
+    if (_isIncome || _manualCategory || description.length < 3) {
+      if (mounted && description.length < 3) {
+        setState(() => _suggestion = null);
+      }
+      return;
+    }
+    _suggestionTimer = Timer(const Duration(milliseconds: 550), () {
+      _requestSuggestion(description);
+    });
+  }
+
+  Future<void> _requestSuggestion(String description) async {
+    if (!mounted || description != _description.text.trim()) return;
+    setState(() => _suggesting = true);
+    try {
+      final result = await ref.read(apiClientProvider).categorize(
+            description: description,
+            amount: double.tryParse(_amount.text.trim()),
+            paymentMethod: _payment,
+            date: _date,
+          );
+      if (!mounted || description != _description.text.trim()) return;
+      setState(() {
+        _suggestion = result;
+        _category = result.category;
+        _suggesting = false;
+      });
+    } on ApiException {
+      if (mounted) setState(() => _suggesting = false);
+    }
   }
 
   Future<void> _pickDate() async {
@@ -72,7 +122,9 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
       await ref.read(expensesProvider.notifier).add(
             amount: amount,
             description: description,
-            category: _category,
+            category: _isIncome || _manualCategory
+                ? (_category ?? 'Miscellaneous')
+                : null,
             date: _date,
             paymentMethod: _payment,
             isIncome: _isIncome,
@@ -141,7 +193,13 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
                 const SizedBox(height: 8),
                 _TransactionType(
                   isIncome: _isIncome,
-                  onChanged: (value) => setState(() => _isIncome = value),
+                  onChanged: (value) {
+                    setState(() {
+                      _isIncome = value;
+                      if (!value) _manualCategory = false;
+                    });
+                    if (!value) _scheduleSuggestion();
+                  },
                 ),
                 const SizedBox(height: 20),
                 TextField(
@@ -171,6 +229,17 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
                     prefixIcon: Icon(Icons.notes_outlined),
                   ),
                 ),
+                if (!_isIncome) ...[
+                  const SizedBox(height: 12),
+                  _AiSuggestion(
+                    suggestion: _suggestion,
+                    loading: _suggesting,
+                    onSelect: (category) => setState(() {
+                      _category = category;
+                      _manualCategory = category != _suggestion?.category;
+                    }),
+                  ),
+                ],
                 const SizedBox(height: 20),
                 Text(
                   'Category',
@@ -182,14 +251,28 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
                   height: 40,
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
-                    itemCount: kCategories.length,
+                    itemCount: kCategories.length + (_isIncome ? 0 : 1),
                     separatorBuilder: (_, __) => const SizedBox(width: 8),
                     itemBuilder: (_, index) {
-                      final category = kCategories[index];
+                      if (!_isIncome && index == 0) {
+                        return FilterChip(
+                          avatar: const Icon(Icons.auto_awesome, size: 17),
+                          label: const Text('Auto AI'),
+                          selected: !_manualCategory,
+                          onSelected: (_) {
+                            setState(() => _manualCategory = false);
+                            _scheduleSuggestion();
+                          },
+                        );
+                      }
+                      final category = kCategories[index - (_isIncome ? 0 : 1)];
                       return CategoryChip(
                         category: category,
                         selected: category == _category,
-                        onTap: () => setState(() => _category = category),
+                        onTap: () => setState(() {
+                          _category = category;
+                          _manualCategory = true;
+                        }),
                       );
                     },
                   ),
@@ -254,6 +337,86 @@ class _AddExpenseScreenState extends ConsumerState<AddExpenseScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _AiSuggestion extends StatelessWidget {
+  const _AiSuggestion({
+    required this.suggestion,
+    required this.loading,
+    required this.onSelect,
+  });
+
+  final CategorizeResult? suggestion;
+  final bool loading;
+  final ValueChanged<String> onSelect;
+
+  @override
+  Widget build(BuildContext context) {
+    if (loading && suggestion == null) {
+      return const Row(
+        children: [
+          SizedBox.square(
+              dimension: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+          SizedBox(width: 10),
+          Text('AI is choosing a category...'),
+        ],
+      );
+    }
+    final result = suggestion;
+    if (result == null) {
+      return Text(
+        'Describe the expense and AI will categorize it automatically.',
+        style: Theme.of(context).textTheme.bodySmall,
+      );
+    }
+    final label =
+        result.modelMode == 'ml' ? 'Trained AI model' : 'Smart fallback';
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withValues(alpha: 0.09),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.22)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.auto_awesome,
+                  size: 18, color: AppColors.primary),
+              const SizedBox(width: 7),
+              Expanded(
+                child: Text(
+                  '$label: ${result.category}',
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+              Text('${(result.confidence * 100).round()}%'),
+            ],
+          ),
+          if (result.alternatives.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Text('Other possibilities',
+                style: Theme.of(context).textTheme.bodySmall),
+            const SizedBox(height: 4),
+            Wrap(
+              spacing: 6,
+              children: [
+                for (final alternative in result.alternatives)
+                  ActionChip(
+                    label: Text(
+                        '${alternative.category} ${(alternative.confidence * 100).round()}%'),
+                    onPressed: () => onSelect(alternative.category),
+                  ),
+              ],
+            ),
+          ],
+        ],
       ),
     );
   }

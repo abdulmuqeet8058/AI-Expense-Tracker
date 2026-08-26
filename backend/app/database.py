@@ -9,6 +9,7 @@ db = client[settings.db_name]
 users = db.users
 expenses = db.expenses
 budgets = db.budgets
+predictions = db.predictions
 
 
 async def ensure_indexes() -> None:
@@ -19,3 +20,5 @@ async def ensure_indexes() -> None:
     await budgets.create_index(
         [("user_id", ASCENDING), ("year", DESCENDING), ("month", DESCENDING)]
     )
+    await predictions.create_index("user_id")
+    await predictions.create_index([("user_id", ASCENDING), ("created_at", DESCENDING)])

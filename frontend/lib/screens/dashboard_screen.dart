@@ -136,6 +136,8 @@ class DashboardScreen extends ConsumerWidget {
 
   List<Widget> _content(BuildContext context, Dashboard d, String currency) {
     return [
+      const _AiCategorizationBanner(),
+      const SizedBox(height: 20),
       Row(
         children: [
           Expanded(
@@ -164,8 +166,6 @@ class DashboardScreen extends ConsumerWidget {
         icon: Icons.account_balance_wallet_outlined,
         color: AppColors.accent,
       ),
-      const SizedBox(height: 16),
-      const _AiComingSoonBanner(),
       const SizedBox(height: 24),
 
       // Budgets
@@ -173,7 +173,7 @@ class DashboardScreen extends ConsumerWidget {
       const SizedBox(height: 12),
       if (d.budgetProgress.isEmpty)
         const _MiniEmpty(
-          icon: Icons.savings_outlined,
+          icon: Icons.account_balance_wallet_outlined,
           text: 'No budgets set. Add one from the Budget tab to track it here.',
         )
       else
@@ -233,8 +233,8 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
-class _AiComingSoonBanner extends StatelessWidget {
-  const _AiComingSoonBanner();
+class _AiCategorizationBanner extends StatelessWidget {
+  const _AiCategorizationBanner();
 
   @override
   Widget build(BuildContext context) {
@@ -275,26 +275,8 @@ class _AiComingSoonBanner extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.18),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: const Text(
-                    'COMING IN THE NEXT PHASE',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 0.6,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 9),
                 Text(
-                  'AI-powered expense tracking',
+                  'AI expense categorization is live',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w800,
@@ -302,7 +284,7 @@ class _AiComingSoonBanner extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  'Smart categorization and spending insights are coming soon.',
+                  'Add an expense to get an automatic category, confidence score, and alternative predictions.',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.86),
                     fontSize: 12,

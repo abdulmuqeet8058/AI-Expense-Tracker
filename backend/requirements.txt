@@ -11,3 +11,9 @@ python-dotenv
 pytest
 httpx
 mongomock-motor
+numpy
+pandas
+scikit-learn
+xgboost
+joblib
+scipy

@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import settings
 from app.database import ensure_indexes
-from app.routes import analytics, auth, budgets, expenses
+from app.routes import analytics, auth, budgets, expenses, ml
 
 
 @asynccontextmanager
@@ -52,10 +52,13 @@ async def rate_limit(request: Request, call_next):
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "phase": 3}
+    return {"status": "ok", "phase": "4A", "ai_feature": "expense categorization"}
 
 
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(expenses.router, prefix="/api/expenses", tags=["expenses"])
 app.include_router(budgets.router, prefix="/api/budgets", tags=["budgets"])
 app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
+app.include_router(ml.router, prefix="/api/ml", tags=["machine-learning"])
+# cd backend
+# .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000

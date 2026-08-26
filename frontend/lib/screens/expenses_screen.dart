@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../config.dart';
 import '../theme.dart';
 import '../models/expense.dart';
+import '../providers/api_provider.dart';
 import '../providers/expense_provider.dart';
 import '../widgets/category_chip.dart';
 import '../widgets/empty_state.dart';
@@ -404,10 +405,11 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
     showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
+      isScrollControlled: true,
       builder: (_) {
         final color = categoryColor(e.category);
         return SafeArea(
-          child: Padding(
+          child: SingleChildScrollView(
             padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -445,7 +447,27 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
                 if (e.confidenceScore != null)
                   _detailRow('ML confidence',
                       '${(_asPercent(e.confidenceScore!)).toStringAsFixed(0)}%'),
+                if (e.categorizationSource != null)
+                  _detailRow(
+                    'Categorized by',
+                    e.categorizationSource == 'ml'
+                        ? 'Trained AI model'
+                        : e.categorizationSource!.replaceAll('_', ' '),
+                  ),
                 const SizedBox(height: 16),
+                if (!e.isIncome)
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.tonalIcon(
+                      icon: const Icon(Icons.edit_outlined),
+                      label: const Text('Correct AI category'),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _correctCategory(e);
+                      },
+                    ),
+                  ),
+                if (!e.isIncome) const SizedBox(height: 8),
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
@@ -468,6 +490,54 @@ class _ExpensesScreenState extends ConsumerState<ExpensesScreen> {
         );
       },
     );
+  }
+
+  Future<void> _correctCategory(Expense expense) async {
+    final chosen = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Correct category'),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              for (final category in kCategories)
+                ListTile(
+                  title: Text(category),
+                  trailing: category == expense.category
+                      ? const Icon(Icons.check_circle, color: AppColors.primary)
+                      : null,
+                  onTap: () => Navigator.pop(dialogContext, category),
+                ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+        ],
+      ),
+    );
+    if (chosen == null) return;
+    try {
+      await ref
+          .read(apiClientProvider)
+          .sendCategoryFeedback(expense.id, chosen);
+      await ref.read(expensesProvider.notifier).refresh();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Category corrected to $chosen. Feedback saved.')),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Couldn't save that correction.")),
+      );
+    }
   }
 
   Widget _detailRow(String label, String value) {

@@ -31,6 +31,7 @@ class Expense {
   final String? receiptUrl;
   final bool isIncome;
   final double? confidenceScore;
+  final String? categorizationSource;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -47,6 +48,7 @@ class Expense {
     this.receiptUrl,
     this.isIncome = false,
     this.confidenceScore,
+    this.categorizationSource,
     this.createdAt,
     this.updatedAt,
   });
@@ -69,6 +71,7 @@ class Expense {
       confidenceScore: json['confidence_score'] == null
           ? null
           : _toDouble(json['confidence_score']),
+      categorizationSource: json['categorization_source'] as String?,
       createdAt: _toDate(json['created_at']),
       updatedAt: _toDate(json['updated_at']),
     );
@@ -87,6 +90,7 @@ class Expense {
         'receipt_url': receiptUrl,
         'is_income': isIncome,
         'confidence_score': confidenceScore,
+        'categorization_source': categorizationSource,
         'created_at': createdAt?.toUtc().toIso8601String(),
         'updated_at': updatedAt?.toUtc().toIso8601String(),
       };
@@ -102,6 +106,7 @@ class Expense {
     String? receiptUrl,
     bool? isIncome,
     double? confidenceScore,
+    String? categorizationSource,
   }) {
     return Expense(
       id: id,
@@ -116,6 +121,7 @@ class Expense {
       receiptUrl: receiptUrl ?? this.receiptUrl,
       isIncome: isIncome ?? this.isIncome,
       confidenceScore: confidenceScore ?? this.confidenceScore,
+      categorizationSource: categorizationSource ?? this.categorizationSource,
       createdAt: createdAt,
       updatedAt: updatedAt,
     );
@@ -144,11 +150,13 @@ class CategorizeResult {
   final String category;
   final double confidence;
   final List<CategorySuggestion> alternatives;
+  final String modelMode;
 
   const CategorizeResult({
     required this.category,
     required this.confidence,
     this.alternatives = const [],
+    this.modelMode = 'rules_fallback',
   });
 
   factory CategorizeResult.fromJson(Map<String, dynamic> json) {
@@ -160,6 +168,7 @@ class CategorizeResult {
       category: json['category'] as String? ?? 'Miscellaneous',
       confidence: _toDouble(json['confidence']),
       alternatives: alts,
+      modelMode: json['model_mode'] as String? ?? 'rules_fallback',
     );
   }
 }

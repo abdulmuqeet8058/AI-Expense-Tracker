@@ -79,8 +79,8 @@ class _HomeShellState extends State<HomeShell> {
               onTap: () => setState(() => _index = 2),
             ),
             _NavItem(
-              icon: Icons.savings_outlined,
-              activeIcon: Icons.savings_rounded,
+              icon: Icons.account_balance_wallet_outlined,
+              activeIcon: Icons.account_balance_wallet_rounded,
               label: 'Budget',
               selected: _index == 3,
               onTap: () => setState(() => _index = 3),

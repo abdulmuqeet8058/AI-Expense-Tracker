@@ -1,6 +1,6 @@
-SMART EXPENSE TRACKER - PHASE 3
+SMART EXPENSE TRACKER - PHASE 4A
 
-Phase 3 adds budgeting, dashboard analytics, charts, reports, and category breakdowns.
+Phase 4A adds trained AI expense categorization on top of the Phase 3 finance features.
 
 CURRENT FEATURES
 
@@ -22,7 +22,9 @@ CURRENT FEATURES
 - Daily, monthly, and category spending charts
 - Category breakdowns and six-month spending trends
 - Monthly financial reports and data export endpoints
-- AI-powered categorization and insights preview for the next phase
+- Automatic expense categorization using TF-IDF text features and XGBoost
+- Live AI suggestions, confidence scores, and alternative categories
+- User corrections stored as feedback for future model improvement
 - FastAPI backend with MongoDB
 - API health endpoint and interactive Swagger documentation
 - Basic in-memory API rate limiting
@@ -42,6 +44,7 @@ Backend:
 - FastAPI and Uvicorn
 - MongoDB with Motor
 - Pydantic
+- scikit-learn, XGBoost, pandas, NumPy, SciPy, and joblib
 - bcrypt password hashing
 - JWT authentication
 
@@ -53,6 +56,8 @@ Expense tracker/
 |   |   |-- routes/auth.py
 |   |   |-- routes/budgets.py
 |   |   |-- routes/analytics.py
+|   |   |-- routes/ml.py
+|   |   |-- ml/categorizer.py
 |   |   |-- auth.py
 |   |   |-- config.py
 |   |   |-- database.py
@@ -60,6 +65,8 @@ Expense tracker/
 |   |   |-- models.py
 |   |   `-- utils.py
 |   |-- tests/test_auth.py
+|   |-- ml_training/generate_data.py
+|   |-- ml_training/train_categorizer.py
 |   |-- .env.example
 |   `-- requirements.txt
 |-- frontend/
@@ -97,6 +104,7 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 Copy-Item .env.example .env
+python ml_training\train_categorizer.py
 python -m uvicorn app.main:app --reload
 
 The API is available at:
@@ -136,7 +144,7 @@ cd frontend
 flutter analyze
 flutter test
 
-PLANNED NEXT PHASE
+PLANNED NEXT PHASES
 
-Phase 4 will introduce trained ML categorization, spending forecasts, anomaly detection,
-personalized AI insights, and receipt support.
+Phase 4B will add spending forecasts, anomaly detection, and personalized insights.
+Phase 5 will add AI-assisted receipt scanning.

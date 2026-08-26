@@ -74,6 +74,7 @@ class ExpenseOut(BaseModel):
     receipt_url: Optional[str] = None
     is_income: bool = False
     confidence_score: Optional[float] = None
+    categorization_source: Optional[str] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
 
@@ -105,3 +106,26 @@ class BudgetOut(BaseModel):
     current_spent: float = 0
     created_at: datetime
     updated_at: Optional[datetime] = None
+
+
+class CategorizeIn(BaseModel):
+    description: str = Field(min_length=1)
+    amount: Optional[float] = Field(default=None, gt=0)
+    payment_method: Optional[str] = None
+    date: Optional[datetime] = None
+
+
+class CategoryAlternative(BaseModel):
+    category: str
+    confidence: float
+
+
+class CategorizeOut(BaseModel):
+    category: str
+    confidence: float
+    alternatives: list[CategoryAlternative] = Field(default_factory=list)
+    model_mode: str
+
+
+class FeedbackIn(BaseModel):
+    correct_category: str = Field(min_length=1)

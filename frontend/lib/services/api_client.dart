@@ -208,6 +208,34 @@ class ApiClient {
     return _map(response.data);
   }
 
+  Future<CategorizeResult> categorize({
+    required String description,
+    double? amount,
+    String? paymentMethod,
+    DateTime? date,
+  }) async {
+    final body = <String, dynamic>{'description': description};
+    if (amount != null && amount > 0) body['amount'] = amount;
+    if (paymentMethod != null) body['payment_method'] = paymentMethod;
+    if (date != null) body['date'] = date.toUtc().toIso8601String();
+    final response = await _post('/ml/categorize', body);
+    return CategorizeResult.fromJson(_map(response.data));
+  }
+
+  Future<void> sendCategoryFeedback(
+    String expenseId,
+    String correctCategory,
+  ) async {
+    await _post('/ml/feedback/$expenseId', {
+      'correct_category': correctCategory,
+    });
+  }
+
+  Future<Map<String, dynamic>> getCategorizationAnalytics() async {
+    final response = await _get('/ml/analytics');
+    return _map(response.data);
+  }
+
   Future<List<Budget>> getBudgets() async {
     final response = await _get('/budgets/');
     return _list(response.data).map(Budget.fromJson).toList();

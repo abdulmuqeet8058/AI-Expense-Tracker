@@ -1,0 +1,50 @@
+Your phone does not see “walking” or “running.”
+It sees a stream of accelerometer numbers.
+
+So how can a mobile app turn those numbers into human activity? 📱🏃
+
+I built a standalone mobile activity-recognition experiment using a Support Vector Machine (SVM) classifier.
+
+The pipeline works like this:
+
+1. The phone collects X, Y, and Z accelerometer readings.
+2. Readings are divided into short 2.5-second windows.
+3. Each window is converted into useful features such as motion intensity, energy, peak-to-peak movement, axis variation, and dominant frequency.
+4. StandardScaler puts those features on comparable scales.
+5. An RBF-kernel SVM classifies the window as stationary, walking, or running.
+6. Sigmoid calibration converts the SVM decision scores into more useful class probabilities.
+7. The application receives the predicted activity, confidence score, and probability for every class.
+
+Why use an SVM?
+
+An SVM searches for a decision boundary with the widest possible margin between classes. The closest training examples—called support vectors—are the critical points that shape that boundary.
+
+The RBF kernel makes the method more powerful: it allows the classifier to separate activities even when their sensor patterns cannot be divided by a simple straight line.
+
+This can support real mobile features such as:
+
+• Fitness and step-tracking applications
+• Automatic workout detection
+• Context-aware interfaces
+• Fall-risk and safety systems
+• Mobility research
+• Battery-aware behaviour adaptation
+
+Tech used:
+
+• Python
+• NumPy for sensor simulation and signal processing
+• pandas for the feature dataset
+• scikit-learn for StandardScaler, SVC, metrics, and the training pipeline
+• CalibratedClassifierCV for probability calibration
+• joblib for saving the trained model
+
+The most important production lesson is not the algorithm alone.
+
+Real activity-recognition data should be split by person or recording session—not randomly by individual rows. Otherwise, movements from the same person can appear in both training and testing data, creating misleadingly high accuracy.
+
+A production mobile solution should also measure latency, battery usage, privacy, and performance across different people, devices, phone positions, and movement styles. Whenever possible, raw sensor data should remain on the device.
+
+Machine learning becomes valuable when raw signals are transformed into a reliable product decision—not when the model stays inside a notebook.
+
+#MachineLearning #SupportVectorMachine #SVM #MobileDevelopment #DataScience #Python #ScikitLearn #ActivityRecognition #ArtificialIntelligence #BuildInPublic

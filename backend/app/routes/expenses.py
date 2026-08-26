@@ -7,6 +7,7 @@ from pymongo import ReturnDocument
 
 from app.auth import get_current_user
 from app.database import expenses as expenses_col
+from app.ml.categorizer import categorizer
 from app.models import ExpenseCreate, ExpenseOut, ExpenseUpdate
 from app.utils import now_utc, oid, serialize
 
@@ -46,9 +47,24 @@ async def create_expense(payload: ExpenseCreate, user: dict = Depends(get_curren
     now = now_utc()
     doc = payload.model_dump()
     doc["date"] = doc.get("date") or now
-    doc["category"] = doc.get("category") or "Miscellaneous"
+    if doc.get("category"):
+        doc["confidence_score"] = None
+        doc["categorization_source"] = "manual"
+    elif doc.get("is_income"):
+        doc["category"] = "Miscellaneous"
+        doc["confidence_score"] = None
+        doc["categorization_source"] = "default"
+    else:
+        suggestion = categorizer.categorize(
+            description=doc["description"],
+            amount=doc["amount"],
+            payment_method=doc.get("payment_method"),
+            when=doc["date"],
+        )
+        doc["category"] = suggestion["category"]
+        doc["confidence_score"] = suggestion["confidence"]
+        doc["categorization_source"] = suggestion["model_mode"]
     doc["user_id"] = oid(user["id"])
-    doc["confidence_score"] = None
     doc["created_at"] = now
     doc["updated_at"] = now
 

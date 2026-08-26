@@ -52,7 +52,7 @@ class BudgetScreen extends ConsumerWidget {
         data: (budgets) {
           if (budgets.isEmpty) {
             return EmptyState(
-              icon: Icons.savings_outlined,
+              icon: Icons.account_balance_wallet_outlined,
               title: 'No budgets yet',
               message:
                   'Set a monthly limit per category and track how much is left.',
