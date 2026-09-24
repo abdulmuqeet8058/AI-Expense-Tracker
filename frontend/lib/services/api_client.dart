@@ -5,6 +5,8 @@ import '../models/budget.dart';
 import '../models/chart_data.dart';
 import '../models/dashboard.dart';
 import '../models/expense.dart';
+import '../models/insight.dart';
+import '../models/recurring_payment.dart';
 import '../models/user.dart';
 import 'auth_storage.dart';
 
@@ -234,6 +236,26 @@ class ApiClient {
   Future<Map<String, dynamic>> getCategorizationAnalytics() async {
     final response = await _get('/ml/analytics');
     return _map(response.data);
+  }
+
+  Future<SpendingForecast> predictSpending() async {
+    final response = await _get('/ml/predict-spending');
+    return SpendingForecast.fromJson(_map(response.data));
+  }
+
+  Future<List<Insight>> getInsights() async {
+    final response = await _get('/ml/insights');
+    final data = _map(response.data);
+    final combined = <Map<String, dynamic>>[
+      ..._list(data['anomalies']),
+      ..._list(data['insights']),
+    ];
+    return combined.map(Insight.fromJson).toList();
+  }
+
+  Future<RecurringPaymentsResult> getRecurringPayments() async {
+    final response = await _get('/ml/recurring-payments');
+    return RecurringPaymentsResult.fromJson(_map(response.data));
   }
 
   Future<List<Budget>> getBudgets() async {

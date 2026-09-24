@@ -1,150 +1,77 @@
-SMART EXPENSE TRACKER - PHASE 4A
+AI EXPENSE TRACKER
 
-Phase 4A adds trained AI expense categorization on top of the Phase 3 finance features.
+A Flutter expense-management app with a FastAPI backend. It tracks income,
+expenses and budgets, then uses machine learning to turn transaction history
+into practical financial insights.
 
-CURRENT FEATURES
+KEY FEATURES
 
-- Flutter application with Material 3 light and dark themes
-- Onboarding flow for first-time users
-- User registration and login
-- JWT access and refresh token generation
-- Secure token storage on the client
-- Automatic saved-session validation at startup
-- Authenticated dashboard and logout
-- Add income and expense transactions
-- Fixed financial categories and payment methods
-- Search, filter, date range, and sorting controls
-- Transaction detail view and deletion
-- Local Hive cache for the expense list
-- Monthly category budgets with configurable alert thresholds
-- Live budget usage and over-budget warnings
-- Dashboard totals, net balance, top categories, and recent activity
-- Daily, monthly, and category spending charts
-- Category breakdowns and six-month spending trends
-- Monthly financial reports and data export endpoints
-- Automatic expense categorization using TF-IDF text features and XGBoost
-- Live AI suggestions, confidence scores, and alternative categories
-- User corrections stored as feedback for future model improvement
-- FastAPI backend with MongoDB
-- API health endpoint and interactive Swagger documentation
-- Basic in-memory API rate limiting
+- Secure registration, login and saved sessions
+- Income and expense tracking with search and filters
+- Monthly budgets, alerts and spending charts
+- Automatic expense categorization with confidence scores
+- Next-month spending forecasts and unusual-spending alerts
+- Personalized financial insights
+- Recurring bill and subscription detection
+- Upcoming-payment and subscription price-increase warnings
+- Light and dark themes
+
+AI FEATURES
+
+- Categorization: TF-IDF and XGBoost classify expense descriptions.
+- Forecasting: XGBoost estimates next month's category spending.
+- Anomaly detection: Isolation Forest finds unusual spending activity.
+- Recurring payments: TF-IDF merchant matching and date-pattern analysis
+  identify weekly, monthly, quarterly and yearly payments.
+
+Recurring-payment detection needs at least three similar transactions. It can
+recognize description variations, estimate the next payment date, calculate
+monthly commitments and highlight price increases.
 
 TECH STACK
 
-Frontend:
-- Flutter and Dart
-- Riverpod state management
-- Dio HTTP client
-- fl_chart data visualization
-- flutter_secure_storage
-- shared_preferences
+Frontend: Flutter, Dart, Riverpod, Dio, Hive and fl_chart
+Backend: Python, FastAPI, MongoDB, Motor and Pydantic
+Machine learning: scikit-learn, XGBoost, pandas and NumPy
+Security: JWT authentication, bcrypt and secure local token storage
 
-Backend:
-- Python 3.11+
-- FastAPI and Uvicorn
-- MongoDB with Motor
-- Pydantic
-- scikit-learn, XGBoost, pandas, NumPy, SciPy, and joblib
-- bcrypt password hashing
-- JWT authentication
+RUN THE PROJECT
 
-PROJECT STRUCTURE
+Requirements: Python 3.11+, Flutter and a running MongoDB service.
 
-Expense tracker/
-|-- backend/
-|   |-- app/
-|   |   |-- routes/auth.py
-|   |   |-- routes/budgets.py
-|   |   |-- routes/analytics.py
-|   |   |-- routes/ml.py
-|   |   |-- ml/categorizer.py
-|   |   |-- auth.py
-|   |   |-- config.py
-|   |   |-- database.py
-|   |   |-- main.py
-|   |   |-- models.py
-|   |   `-- utils.py
-|   |-- tests/test_auth.py
-|   |-- ml_training/generate_data.py
-|   |-- ml_training/train_categorizer.py
-|   |-- .env.example
-|   `-- requirements.txt
-|-- frontend/
-|   |-- lib/
-|   |   |-- models/user.dart
-|   |   |-- providers/
-|   |   |-- screens/
-|   |   |-- services/
-|   |   |-- app.dart
-|   |   |-- config.dart
-|   |   |-- main.dart
-|   |   `-- theme.dart
-|   `-- pubspec.yaml
-`-- README.txt
-
-RUNNING LOCALLY
-
-1. Start MongoDB
-
-MongoDB must be running at:
-
-mongodb://localhost:27017
-
-On Windows, check the MongoDB service with:
-
-Get-Service MongoDB
-Start-Service MongoDB
-
-2. Start the backend
-
-Open PowerShell in the project folder and run:
+First-time backend setup:
 
 cd backend
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 Copy-Item .env.example .env
-python ml_training\train_categorizer.py
-python -m uvicorn app.main:app --reload
+.\.venv\Scripts\python.exe ml_training\train_categorizer.py
+.\.venv\Scripts\python.exe ml_training\train_phase4b.py
 
-The API is available at:
+Start the backend:
 
-http://localhost:8000
+cd backend
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-Swagger API documentation:
-
-http://localhost:8000/docs
-
-3. Start the Flutter application
-
-Open another terminal:
+Start the Flutter app in another terminal:
 
 cd frontend
 flutter pub get
 flutter run
 
-The default API address is configured for the current physical Android device network:
+The Android device and computer must use the same network. The configured API
+address is http://192.168.100.5:8000/api.
 
-http://192.168.100.5:8000/api
-
-For Chrome or desktop, run:
-
-flutter run -d chrome --dart-define=API_BASE_URL=http://localhost:8000/api
+API documentation: http://localhost:8000/docs
 
 TESTING
 
 Backend:
 
 cd backend
-pytest
+.\.venv\Scripts\python.exe -m pytest
 
-Flutter:
+Flutter static analysis:
 
 cd frontend
 flutter analyze
-flutter test
-
-PLANNED NEXT PHASES
-
-Phase 4B will add spending forecasts, anomaly detection, and personalized insights.
-Phase 5 will add AI-assisted receipt scanning.

@@ -16,6 +16,7 @@ import '../widgets/empty_state.dart';
 import '../widgets/section_header.dart';
 import '../widgets/summary_card.dart';
 import 'categories_screen.dart';
+import 'insights_screen.dart';
 
 final _nf = NumberFormat('#,##0', 'en_US');
 String _money(num v, String currency) => '$currency ${_nf.format(v)}';
@@ -136,7 +137,9 @@ class DashboardScreen extends ConsumerWidget {
 
   List<Widget> _content(BuildContext context, Dashboard d, String currency) {
     return [
-      const _AiCategorizationBanner(),
+      _AiIntelligenceBanner(
+        onTap: () => _push(context, const InsightsScreen()),
+      ),
       const SizedBox(height: 20),
       Row(
         children: [
@@ -233,68 +236,84 @@ class DashboardScreen extends ConsumerWidget {
   }
 }
 
-class _AiCategorizationBanner extends StatelessWidget {
-  const _AiCategorizationBanner();
+class _AiIntelligenceBanner extends StatelessWidget {
+  const _AiIntelligenceBanner({required this.onTap});
+
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF2979FF), Color(0xFF00A86B)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.accent.withValues(alpha: 0.2),
-            blurRadius: 18,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 52,
-            height: 52,
+    return Semantics(
+      button: true,
+      label: 'Open AI insights',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Ink(
+            padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Icon(
-              Icons.auto_awesome_rounded,
-              color: Colors.white,
-              size: 28,
-            ),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'AI expense categorization is live',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w800,
-                      ),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  'Add an expense to get an automatic category, confidence score, and alternative predictions.',
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.86),
-                    fontSize: 12,
-                    height: 1.35,
-                  ),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF2979FF), Color(0xFF00A86B)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.accent.withValues(alpha: 0.2),
+                  blurRadius: 18,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
+            child: Row(
+              children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.18),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(
+                    Icons.auto_awesome_rounded,
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'AI financial intelligence',
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        'Explore automatic categories, recurring bills, spending forecasts, unusual activity, and personalized insights.',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.86),
+                          fontSize: 12,
+                          height: 1.35,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 6),
+                const Icon(Icons.chevron_right_rounded, color: Colors.white),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }

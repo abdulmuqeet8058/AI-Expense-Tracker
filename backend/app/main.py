@@ -52,7 +52,17 @@ async def rate_limit(request: Request, call_next):
 
 @app.get("/api/health")
 async def health():
-    return {"status": "ok", "phase": "4A", "ai_feature": "expense categorization"}
+    return {
+        "status": "ok",
+        "phase": 5,
+        "ai_features": [
+            "expense categorization",
+            "spending forecasts",
+            "anomaly detection",
+            "personalized insights",
+            "recurring payment intelligence",
+        ],
+    }
 
 
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])

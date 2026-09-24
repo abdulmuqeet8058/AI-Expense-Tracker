@@ -129,3 +129,35 @@ class CategorizeOut(BaseModel):
 
 class FeedbackIn(BaseModel):
     correct_category: str = Field(min_length=1)
+
+
+class RecurringPaymentOut(BaseModel):
+    id: str
+    merchant: str
+    category: str
+    cadence: str
+    occurrence_count: int
+    typical_amount: float
+    expected_amount: float
+    monthly_equivalent: float
+    last_payment_date: datetime
+    next_expected_date: datetime
+    days_until_due: int
+    confidence: float
+    price_change_percent: Optional[float] = None
+    status: str
+    detection_method: str
+
+
+class RecurringSummaryOut(BaseModel):
+    detected_count: int
+    monthly_commitment: float
+    upcoming_30_days: int
+    price_increases: int
+    currency: str
+    model: str
+
+
+class RecurringPaymentsOut(BaseModel):
+    recurring_payments: list[RecurringPaymentOut] = Field(default_factory=list)
+    summary: RecurringSummaryOut
